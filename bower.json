@@ -1,0 +1,24 @@
+{
+  "name": "wiki",
+  "homepage": "https://github.com/znetstar/wiki",
+  "authors": [
+    "Zachary Boyd <zacharyboyd@znetstar.net>"
+  ],
+  "description": "",
+  "main": "",
+  "moduleType": [],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "~2.2.0",
+    "bootstrap": "~3.3.6",
+    "moment": "~2.11.1",
+    "font-awesome": "~4.5.0"
+  }
+}
