@@ -1,1 +1,2 @@
-@import('/lib/bootstrap/dist/css/bootstrap.min.css');
+@import url('/lib/bootstrap/dist/css/bootstrap.min.css');
+@import url('/lib/font-awesome/css/font-awesome.min.css');

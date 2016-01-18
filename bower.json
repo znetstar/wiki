@@ -19,6 +19,7 @@
     "jquery": "~2.2.0",
     "bootstrap": "~3.3.6",
     "moment": "~2.11.1",
-    "font-awesome": "~4.5.0"
+    "font-awesome": "~4.5.0",
+    "material-design-lite": "~1.0.6"
   }
 }
