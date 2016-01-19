@@ -34,8 +34,14 @@
 	      <div class="mdl-layout-spacer"></div>
 	      <!-- Navigation -->
 	      <nav class="mdl-navigation">
+	      	<% if !@user %>
 	        <a class="mdl-navigation__link" href="/create">Create an account</a>
 	        <a class="mdl-navigation__link" href="/login">Login to <%= @title %></a>
+	      	<% else %>
+	      		<small class="mdl-navigation__link">Welcome <%= @user['fname'] %></small>
+	      		<a class="mdl-navigation__link" href="/edit">Edit my account</a>
+	      		<a class="mdl-navigation__link" href="/logout">Logout</a>
+	      	<% end %>
 	      </nav>
 	    </div>
 		</header>
@@ -45,9 +51,12 @@
 			</div>
 			<span class="mdl-layout-title top-sidebar"><%= @title %></span>
 			<nav class="mdl-navigation">
+				<% if !@user %>
 				<a class="mdl-navigation__link" href="/login">Login to <%= @title %></a>
+				<% else %>
 				<a class="mdl-navigation__link" href="/history">History</a>
 				<a class="mdl-navigation__link" href="/saved">Saved Pages</a>
+				<% end %>
 			</nav>
 		</div>
 		<main class="mdl-layout__content"><%= yield %></main>
