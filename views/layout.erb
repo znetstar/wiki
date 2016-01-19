@@ -3,13 +3,55 @@
 <head>
 	<title>Wiki</title>
 	<link rel="stylesheet" href="/lib/material-design-lite/material.min.css">
-
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+	<link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
 	<link rel="stylesheet" href="/style.css"/>
-
+	<meta charset="UTF-8">
 </head>
 <body>
-	<%= yield %>
+	<div class="noselect mdl-layout mdl-js-layout">
+  	<header class="mdl-layout__header">
+			<div class="mdl-layout__header-row">
+				<!-- Title -->
+				<span class="mdl-layout-title"><a href="/"><%= @title %></a></span>
+				<!-- Add spacer, to align navigation to the right -->
+				<div class="mdl-layout-spacer"></div>
+				<div class="mdl-textfield mdl-js-textfield mdl-textfield--expandable
+				            mdl-textfield--floating-label mdl-textfield--align-right">
+				  <label class="mdl-button mdl-js-button mdl-button--icon"
+				         for="fixed-header-drawer-exp">
+				    <i class="material-icons">search</i>
+				  </label>
+				  <div class="mdl-textfield__expandable-holder">
+				    <input class="mdl-textfield__input searchbar" type="text" name="search"
+				           id="fixed-header-drawer-exp">
+				  </div>
+				</div>
+			</div>
+	    <!-- Bottom row, not visible on scroll -->
+	    <div class="mdl-layout__header-row">
+	      <div class="mdl-layout-spacer"></div>
+	      <!-- Navigation -->
+	      <nav class="mdl-navigation">
+	        <a class="mdl-navigation__link" href="/create">Create an account</a>
+	        <a class="mdl-navigation__link" href="/login">Login to <%= @title %></a>
+	      </nav>
+	    </div>
+		</header>
+		<div class="mdl-layout__drawer">
+			<div class="top-sidebar">
+				<img class="img-responsive" src="<%= @logo %>" />
+			</div>
+			<span class="mdl-layout-title top-sidebar"><%= @title %></span>
+			<nav class="mdl-navigation">
+				<a class="mdl-navigation__link" href="/login">Login to <%= @title %></a>
+				<a class="mdl-navigation__link" href="/history">History</a>
+				<a class="mdl-navigation__link" href="/saved">Saved Pages</a>
+			</nav>
+		</div>
+		<main class="mdl-layout__content"><%= yield %></main>
+	</div>
 	<script src="/lib/jquery/dist/jquery.min.js"></script>
 	<script src="/lib/bootstrap/dist/js/bootstrap.min.js"></script>
 	<script src="/lib/material-design-lite/material.min.js"></script>
