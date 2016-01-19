@@ -1,0 +1,47 @@
+<div class="mdl-grid noselect">
+  <div class="mdl-cell mdl-cell--4-col"></div>
+  <div class="mdl-cell mdl-cell--4-col login-panel">
+  	<% if @logo %>
+  	<div class="login-logo">
+	  	<img src="<%=@logo%>" class="img-responsive"></img>
+	  </div>
+	  <% end %>
+	  <div class="login-header">
+	  	<h1>Create an account on <%= @title %></h1>
+	  </div>
+	  <% if @error %>
+	  <div class="login-error">
+	  	<span><%= @error %></span>
+	  </div>
+	  <% end %>
+	  <div class="login-form">
+	  	<form action="/create" method="post">
+	  		<div class="name">
+				  <div class="mdl-textfield mdl-js-textfield">
+				    <input class="mdl-textfield__input" type="text" name="fname" id="fname">
+				    <label class="mdl-textfield__label" for="fname">First Name</label>
+				  </div>
+				  <div class="mdl-textfield mdl-js-textfield">
+				    <input class="mdl-textfield__input" type="text" name="lname" id="lname">
+				    <label class="mdl-textfield__label" for="lname">Last Name</label>
+				  </div>
+				</div>
+			  <div class="mdl-textfield mdl-js-textfield">
+			    <input class="mdl-textfield__input" name="email" type="email" id="email">
+			    <label class="mdl-textfield__label" for="email">Email Address</label>
+			    <span class="mdl-textfield__error">Not a valid email</span>
+			  </div>
+			  <div class="mdl-textfield mdl-js-textfield">
+			    <input class="mdl-textfield__input" name="password" type="password" id="password">
+			    <label class="mdl-textfield__label" for="password">Password</label>
+			  </div>
+			  <div>
+					<button class="mdl-button mdl-js-ripple-effect mdl-js-button mdl-button--raised mdl-button--colored">
+					  Create Account
+					</button>
+				</div>
+			</form>
+	  </div>
+  </div>
+  <div class="mdl-cell mdl-cell--4-col"></div>
+</div>
