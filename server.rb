@@ -33,11 +33,27 @@ module Wiki
 			end
 		end
 
+		def tags(lim = 5)
+			tags = db.exec("select tag,count(*) from wiki_article_tags group by tag order by count(*) desc limit #{lim}")
+			return tags
+		end
+
 		get '/' do
 			site_info
+			tags
+			@articles = []
 			@user = user
 			erb :index
 		end
+
+		get '/articles/edit/:article_id' do
+			
+		end
+
+		get '/articles/create' do
+			
+		end
+
 
 		get '/logout' do
 			site_info
