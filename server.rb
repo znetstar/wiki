@@ -159,6 +159,34 @@ module Wiki
 				}
 		end
 
+		get '/search/:query' do
+			site_info
+
+			articles = db.exec("select * from wiki_articles where title ~* '#{params['query']}';")
+			articles = articles_with_body(articles)
+			erb :search, :locals => { 
+				:last_visted => ((defined? last_visted) ? last_visted : nil), 
+				:tags => top_tags, 
+				:user => user, 
+				:articles => articles,
+				:query => params['query']
+			}
+		end
+
+		get '/tag/:tag' do
+			site_info
+
+			articles = db.exec("select wiki_articles.* from wiki_articles,wiki_article_tags where wiki_article_tags.tag='#{params['tag']}' and wiki_articles.id=wiki_article_tags.article_id;")
+			articles = articles_with_body(articles)
+			erb :search, :locals => { 
+				:last_visted => ((defined? last_visted) ? last_visted : nil), 
+				:tags => top_tags, 
+				:user => user, 
+				:articles => articles,
+				:query => params['query']
+			}
+		end
+
 		get '/articles/:article_id/:action' do
 			redirect to("/articles/#{params['article_id']}/#{params['action']}/latest")
 		end
