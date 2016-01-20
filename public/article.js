@@ -15,7 +15,8 @@ function sync_changes () {
 		try {
 			var resp = JSON.parse(data);
 
-			$('.article-header h1,title,meta[name="title"]').html(resp.title);
+			$('.article-header h1').html(resp.title);
+			$('title').html(`${resp.title} - ${$('meta[name="title"]').attr('content')}`);
 			$('.article-body').html(resp.body);
 
 			$('a[rel="author"]')
@@ -43,8 +44,23 @@ $(function () {
 			sync_changes();
 		});
 
-		var simplemde = window.simplemde = new SimpleMDE({ element: $("textarea.edit")[0] });
-		simplemde.codemirror.on("change", function(){
+		var simplemde = window.simplemde = new SimpleMDE({ 
+			element: $("textarea.edit")[0],
+			autoDownloadFontAwesome: false,
+			autosave: {
+				enabled: true,
+				delay: 10000,
+				uniqueId: $('[name="article_id"]').attr('content')
+			}
+		});
+
+		simplemde._autosave = simplemde.autosave;
+		simplemde.autosave = function () {
+			sync_changes();
+			simplemde._autosave.apply(this, arguments);
+		}
+
+		simplemde.codemirror.on('blur', function () {
 			sync_changes();
 		});
 

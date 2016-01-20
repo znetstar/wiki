@@ -60,7 +60,7 @@ create table wiki_article_revisions(
 	article_id serial references wiki_articles(id),
 	user_id serial references wiki_users(id),
 	created timestamp not null default current_timestamp,
-	body text not null
+	body text not null default ''
 );
 
 create table wiki_history(

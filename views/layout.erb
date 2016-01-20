@@ -1,15 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title><%= @article ? @article['title']+' - ' : '' %>Wiki</title>
-	<link rel="stylesheet" href="/lib/material-design-lite/material.min.css">
+	<title><%= defined?(article) ? article['title']+' - ' : '' %>Wiki</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-	<link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
 	<link rel="stylesheet" href="/style.css"/>
 	<meta name="title" content="<%= @title %>" />
-	<% if @article %>
-	<meta name="article_id" content="<%= @article['id'] %>" />
+	<% if defined? article %>
+	<meta name="article_id" content="<%= article['id'] %>" />
 	<% end %>
 	<meta charset="UTF-8">
 	<script src="/lib/jquery/dist/jquery.min.js"></script>
@@ -21,11 +18,11 @@
 				<span class="mdl-layout-title"><a href="/"><%= @title %></a></span>	
 	      <!-- Navigation -->
 	      <nav class="mdl-navigation mdl-layout--large-screen-only">
-	      	<% if !@user %>
+	      	<% if !user %>
 	        <a class="mdl-navigation__link" href="/create">Create an account</a>
 	        <a class="mdl-navigation__link" href="/login">Login to <%= @title %></a>
 	      	<% else %>
-	      		<small class="mdl-navigation__link">Welcome <%= @user['fname'] %></small>
+	      		<small class="mdl-navigation__link">Welcome <%= user['fname'] %></small>
 	      		<a class="mdl-navigation__link" href="/edit">Edit my account</a>
 	      		<a class="mdl-navigation__link" href="/logout">Logout</a>
 	      	<% end %>
@@ -43,10 +40,10 @@
 				  </div>
 				</div>
 			</div>
-	    <% if @article %>
+	    <% if (defined? article) and (user != nil) %>
 	    <div class="mdl-layout__tab-bar mdl-js-ripple-effect">
-	      <a href="#view" class="mdl-layout__tab  <%= @action == 'view' ? 'is-active' : '' %>">View</a>
-	      <a href="#edit" class="mdl-layout__tab  <%= @action == 'edit' ? 'is-active' : '' %>">Edit</a>
+	      <a href="#view" class="mdl-layout__tab  <%= action == 'view' ? 'is-active' : '' %>">View</a>
+	      <a href="#edit" class="mdl-layout__tab  <%= action == 'edit' ? 'is-active' : '' %>">Edit</a>
 	      <a href="#history" class="mdl-layout__tab">History</a>
 	    </div>
 	    <% end %>
@@ -57,7 +54,7 @@
 			</div>
 			<span class="mdl-layout-title top-sidebar"><%= @title %></span>
 			<nav class="mdl-navigation">
-				<% if !@user %>
+				<% if !user %>
 				<a class="mdl-navigation__link" href="/login">Login to <%= @title %></a>
 				<% else %>
 				<a class="mdl-navigation__link" href="/new_article">Add an Article</a>

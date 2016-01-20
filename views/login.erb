@@ -10,20 +10,20 @@
 	  	<h1>Login to <%= @title %></h1>
 	  </div>
 	  <div class="login-status">
-	  	<% if @email %>
+
+	  	<% if defined? message %>
+	  	<%= message %>
+	  	<% end %>
+	  	<% if defined?(err) %>
+	  	<span><%= err %></span>
+	  	<% elsif defined? email %>
 	  	<span>Please login</span>
-	  	<% end %>
-	  	<% if @message %>
-	  	<%= @message %>
-	  	<% end %>
-	  	<% if @error %>
-	  	<span><%= @error %></span>
 	  	<% end %>
 	  </div>
 	  <div class="login-form">
 	  	<form action="/login" method="post">
 			  <div class="mdl-textfield mdl-js-textfield">
-			    <input class="mdl-textfield__input" value="<%= @email %>" name="email" type="email" id="email">
+			    <input class="mdl-textfield__input" value="<%= defined?(email) ? email : '' %>" name="email" type="email" id="email">
 			    <label class="mdl-textfield__label" for="email">Email Address</label>
 			    <span class="mdl-textfield__error">Not a valid email</span>
 			  </div>

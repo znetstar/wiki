@@ -4,6 +4,7 @@ require 'securerandom'
 require 'redcarpet'
 require 'date'
 require "base64"
+require 'nokogiri'
 
 module Wiki
 	class Server < Sinatra::Base
@@ -28,9 +29,10 @@ module Wiki
 
 		def user
 			token = session[:session_token]
-			user = db.exec('select * from wiki_users,wiki_sessions where wiki_users.id = wiki_sessions.user_id;')
-			if user.num_tuples > 0
-				user[0]
+			if (defined? token) && (token != nil)
+				user = db.exec("select wiki_users.* from wiki_users,wiki_sessions where wiki_sessions.token='#{token}' and wiki_users.id = wiki_sessions.user_id;")
+
+				return (user.num_tuples > 0) ? user[0] : nil
 			else
 				nil
 			end
@@ -48,20 +50,66 @@ module Wiki
 			return @_markdown
 		end
 
+		def article_body(id)
+			rev = db.exec("select body from wiki_article_revisions where article_id=#{id} order by created desc limit 1")
+			if rev.any?
+				md = Base64.decode64(rev[0]['body'])
+				html = markdown.render(md)
+				return { :markdown => md, :html => html }
+			else
+				nil
+			end
+		end
+
+		def articles_with_body(articles)
+			arr = []
+			if !articles.any?
+				return arr
+			end
+			articles.each do |article| 
+				body = article_body(article['id'])
+				if body
+					article['html'] = body[:html]
+					article['markdown'] = body[:markdown]
+					article['text'] = Nokogiri::HTML(body[:html]).text
+					article['summary'] = article['text'][0..140].gsub(/\s\w+\s*$/,'...')
+				else
+					article['html'] = nil
+					article['markdown'] = nil
+					article['summary'] =  nil
+					article['text'] = nil
+					article['summary'] = nil
+				end
+				arr.push(article)
+			end
+			arr
+		end
+
+		delete '/article/:article_id' do
+			db.exec("delete from wiki_article_revisions where article_id=#{params[:article_id]}")
+			db.exec("delete from wiki_article_comments where article_id=#{params[:article_id]}")
+			db.exec("delete from wiki_article_tags where article_id=#{params[:article_id]}")
+			db.exec("delete from wiki_history where article_id=#{params[:article_id]}")
+			db.exec("delete from wiki_bookmarks where id=#{params[:article_id]}")
+			db.exec("delete from wiki_articles where id=#{params[:article_id]}")	
+		end
+
 		put '/article/:article_id' do
-			@user = user
+			if !user 
+				status 401
+				return
+			end
 			md = params['body']
 			db.exec("update wiki_articles set title='#{params['title']}' where id=#{params['article_id']}")
-			db.exec("insert into wiki_article_revisions(article_id,user_id,body) values('#{params['article_id']}', '#{@user['id']}', '#{Base64.encode64(params['body'])}')")
-			@markdown = md
-			@html = markdown.render(@markdown)
+			db.exec("insert into wiki_article_revisions(article_id,user_id,body) values('#{params['article_id']}', '#{user['id']}', '#{Base64.encode64(params['body'])}')")
+			html = markdown.render(md)
 			resp = {
 				:title => params['title'],
-				:body => @html,
+				:body => html,
 				:author => {
-					:fname => @user['fname'],
-					:lname => @user['lname'],
-					:id => @user['id']
+					:fname => user['fname'],
+					:lname => user['lname'],
+					:id => user['id']
 				},
 				:datetime => DateTime.now.strftime('%Y-%m-%d %H:%M:%S')
 			}
@@ -71,32 +119,45 @@ module Wiki
 		get '/' do
 			site_info
 			tags
-			@articles = []
-			@user = user
-			erb :index
+
+			if user 
+				last_visted = []
+				last_visted = articles_with_body(db.exec("select distinct wiki_articles.* from wiki_articles,wiki_history where wiki_articles.id=wiki_history.article_id and wiki_history.user_id=#{user['id']}"))
+			end
+			articles = db.exec('select * from wiki_articles order by hits desc limit 10')
+			articles = articles_with_body(articles)
+			erb :index, :locals => { 
+					:last_visted => ((defined? last_visted) ? last_visted : nil), 
+					:tags => tags, 
+					:user => user, 
+					:articles => articles
+				}
 		end
 
 
 		get '/articles/:article_id/:action' do
-			if params['action'] == 'edit' && !user
+			if params['action'] != 'view' && !user
 				redirect to('/login')
 			end
 			site_info
-			@user = user
-			@action = params[:action]
+			action = params[:action]
 			rev = db.exec("select body,user_id,created from wiki_article_revisions where article_id=#{params['article_id']} order by created desc limit 1")
 			if rev.num_tuples > 0
-				@markdown = Base64.decode64(rev[0]['body'])
-				@html = markdown.render(@markdown)
+				md = Base64.decode64(rev[0]['body'])
+				html = markdown.render(md)
+			end
+			db.exec("update wiki_articles set hits=(wiki_articles.hits + 1) where id=#{params['article_id']}")
+			if user
+				db.exec("insert into wiki_history(user_id,article_id,viewed) values(#{user['id']},#{params['article_id']},current_timestamp)")
 			end
 			article = db.exec("select * from wiki_articles where id=#{params['article_id']}")
 			
 			if article.num_tuples > 0
-				@article = article[0]
-				@author = db.exec("select * from wiki_users where id=#{rev[0]['user_id']}")[0]
-				@date = DateTime.parse(rev[0]['created']).strftime('%F')
-				@time = DateTime.parse(rev[0]['created']).strftime('%m/%d/%Y at %I:%M%p')
-				erb :article
+				article = article[0]
+				author = rev.any? ? db.exec("select * from wiki_users where id=#{rev[0]['user_id']}")[0] : user
+				date = DateTime.parse(rev[0]['created']).strftime('%F')
+				time = DateTime.parse(rev[0]['created']).strftime('%m/%d/%Y at %I:%M%p')
+				erb :article, :locals => { :html => html, :markdown => md, :user => user, :action => action, :article => article, :author => author, :date => date, :time => time  }
 			else
 				status 404
 			end
@@ -112,22 +173,25 @@ module Wiki
 				redirect to('/login')
 			end
 			article = db.exec("insert into wiki_articles(title) values('Untitled Article') returning id")[0];
-
+			rev = db.exec("insert into wiki_article_revisions(user_id,article_id) values('#{user['id']}', '#{article['id']}')")
 			redirect to("/articles/#{article['id']}/edit");
 		end
 
 
 		get '/logout' do
 			site_info
+			if session[:session_token]
+				db.exec("delete from wiki_sessions where token='#{session[:session_token]}'")
+			end
 			session.clear
-			@message = 'Successfully logged out'
-			erb :login
+			message = 'Successfully logged out'
+			erb :login, :locals => { :message => message }
 		end
 
 		get '/login' do
 			site_info
-			@email = session[:email]
-			erb :login
+			email = session[:email]
+			erb :login, :locals => { :email => email }
 		end
 
 		get '/login' do
@@ -139,28 +203,28 @@ module Wiki
 			site_info
 
 			begin
-				user = db.exec("select * from wiki_users where email='#{params[:email]}';")
+				_user = db.exec("select * from wiki_users where email='#{params[:email]}';")
 				
-				if user.num_tuples > 0
-					@user = user[0]
-					pw = BCrypt::Password.new(@user['password'])
+				if _user.num_tuples > 0
+					_user = _user[0]
+					pw = BCrypt::Password.new(_user['password'])
 					if pw == params[:password]
 						token = SecureRandom.uuid
-						db.exec("insert into wiki_sessions(user_id, token, created) values (#{@user['id']}, '#{token}', current_timestamp);")
+						db.exec("insert into wiki_sessions(user_id, token, created) values (#{_user['id']}, '#{token}', current_timestamp);")
 						session[:session_token] = token
 						redirect to('/')
 					else
-						@error = 'Invalid password'
-						@email = @user[:email]
-						erb :login
+						error = 'Invalid password'
+						email = _user[:email]
+						erb :login, :locals => { :email => email, :err => error  }
 					end
 				else
-					@error = 'An account with this email address could not be found'
-					erb :login
+					error = 'An account with this email address could not be found'
+					erb :login, :locals => { :err => error  }
 				end
 			rescue PG::Error => err
-				@error = err.message
-				erb :login
+				error = err.message
+				erb :login, :locals => { :err => error  }
 			end
 
 		end
@@ -179,11 +243,11 @@ module Wiki
 				redirect to('/login')
 			rescue PG::Error => err
 				if err.message.include? 'duplicate key'
-					@error = 'An account with the submitted email address already exists'
+					error = 'An account with the submitted email address already exists'
 				else
-					@error = err.message
+					error = err.message
 				end
-				erb :create
+				erb :create, :locals => { :err => error  }
 			end
 		end
 	end

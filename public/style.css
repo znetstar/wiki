@@ -1,3 +1,6 @@
+@import url('/fonts/Material-Icons.css');
+@import url('/fonts/Roboto.css');
+@import url('/lib/material-design-lite/material.min.css');
 @import url('/lib/bootstrap/dist/css/bootstrap.min.css');
 @import url('/lib/font-awesome/css/font-awesome.min.css');
 
@@ -72,4 +75,13 @@ article .article-header h1 {
 
 .searchbar {
   color: white;
+}
+
+.articles {
+  line-height: 2em;
+}
+
+
+.welcome-text {
+  font-size: 2em;
 }
