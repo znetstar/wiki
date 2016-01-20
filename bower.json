@@ -22,7 +22,6 @@
     "font-awesome": "~4.5.0",
     "material-design-lite": "~1.0.6",
     "simplemde": "~1.9.0",
-    "strftime": "~0.9.2",
-    "bootstrap-tags": "~1.1.6"
+    "strftime": "~0.9.2"
   }
 }
