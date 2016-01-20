@@ -38,8 +38,8 @@ module Wiki
 			end
 		end
 
-		def tags(lim = 5)
-			tags = db.exec("select tag,count(*) from wiki_article_tags group by tag order by count(*) desc limit #{lim}")
+		def top_tags(lim = 5)
+			tags = db.exec("select distinct tag,count(*) from wiki_article_tags group by tag order by count(*) desc limit #{lim}")
 			return tags
 		end
 
@@ -117,10 +117,21 @@ module Wiki
 			md = params['body']
 			db.exec("update wiki_articles set title='#{params['title']}' where id=#{params['article_id']}")
 			db.exec("insert into wiki_article_revisions(article_id,user_id,body) values('#{params['article_id']}', '#{user['id']}', '#{Base64.encode64(params['body'])}')")
+			db.exec("delete from wiki_article_tags where article_id=#{params['article_id']}")
+			
+			tags = params['tags'].split(',')
+			tags.each do |tag| 
+				begin
+					db.exec("insert into wiki_article_tags(tag,user_id,article_id) values('#{tag}'	,#{user['id']},#{params['article_id']})")
+				rescue
+				end
+			end
 			html = markdown.render(md)
+			
 			resp = {
 				:title => params['title'],
 				:body => html,
+				:tags => tags,
 				:author => {
 					:fname => user['fname'],
 					:lname => user['lname'],
@@ -133,7 +144,6 @@ module Wiki
 
 		get '/' do
 			site_info
-			tags
 
 			if user 
 				last_visted = []
@@ -143,7 +153,7 @@ module Wiki
 			articles = articles_with_body(articles)
 			erb :index, :locals => { 
 					:last_visted => ((defined? last_visted) ? last_visted : nil), 
-					:tags => tags, 
+					:tags => top_tags, 
 					:user => user, 
 					:articles => articles
 				}
@@ -152,6 +162,7 @@ module Wiki
 		get '/articles/:article_id/:action' do
 			redirect to("/articles/#{params['article_id']}/#{params['action']}/latest")
 		end
+
 		get '/articles/:article_id/:action/:revision' do
 			if params['action'] != 'view' && !user
 				redirect to('/login')
@@ -160,6 +171,7 @@ module Wiki
 			action = params[:action]
 			rev = db.exec("select user_id,created,body from wiki_article_revisions where #{params['revision'] == 'latest' ? '' : 'id='+params['revision']+' and ' }article_id=#{params['article_id']} order by created desc limit 1")[0]
 			revs = db.exec("select wiki_article_revisions.id,wiki_article_revisions.user_id,wiki_article_revisions.created,wiki_article_revisions.article_id,wiki_users.fname as author_fname,wiki_users.lname as author_lname,wiki_users.id as author_id from wiki_article_revisions,wiki_users where wiki_users.id=wiki_article_revisions.user_id and article_id=#{params['article_id']} order by created desc limit 25")
+			tags = db.exec("select tag,id from wiki_article_tags where article_id=#{params['article_id']}")
 			if revs.any?
 				md = Base64.decode64(rev['body'])
 				html = markdown.render(md)
@@ -175,7 +187,20 @@ module Wiki
 				author = revs.any? ? db.exec("select * from wiki_users where id=#{rev['user_id']}")[0] : user
 				date = DateTime.parse(rev['created']).strftime('%F')
 				time = DateTime.parse(rev['created']).strftime('%m/%d/%Y at %I:%M%p')
-				erb :article, :locals => { :rev_id => params['revision'], :revs => revs, :html => html, :markdown => md, :user => user, :action => action, :article => article, :author => author, :date => date, :time => time  }
+				
+				erb :article, :locals => {  
+					:rev_id => params['revision'], 
+					:revs => revs, 
+					:html => html, 
+					:markdown => md, 
+					:user => user, 
+					:action => action, 
+					:article => article, 
+					:author => author, 
+					:date => date, 
+					:time => time, 
+					:tags => (tags.any? and tags)
+				}
 			else
 				status 404
 			end

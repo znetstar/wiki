@@ -105,3 +105,82 @@ table.history tr {
   flex-direction: column;
   margin: 1em;
 }
+
+ul.tags li {
+  list-style-type: none;
+  margin-right: 1em;
+  float: left;
+}
+
+ul.tags li.tag {
+
+}
+
+ul.tags {
+  display: block;
+  height: 2.5rem;
+  margin-bottom: 0;
+  font-size: 9pt;
+  position: relative;
+  left: -40px;
+}
+
+ul.top-tags li {
+  list-style: none;
+}
+
+ul.top-tags li.static {
+  font-size: 14pt;
+}
+
+ul.top-tags li.tag {
+  float: left;
+  margin-right: 1em;
+}
+
+ul.edit-tags {
+  text-align: center;
+  vertical-align: middle;
+  position: relative;
+  display: inline-block;
+  box-sizing: border-box;
+  width: 300px;
+  max-width: 100%;
+  margin: 0;
+  padding: 20px 0;
+}
+
+ul.edit-tags li {
+  list-style: none;
+  float: left;
+  margin-right: 1em;
+}
+
+ul.edit-tags li.tag {
+
+}
+
+.new-tag {
+  overflow: visible;
+  background: transparent;
+  display: inline-flex;
+  border: none;
+  width: auto;
+  border-bottom: rgba(0,0,0,.25) solid thin;
+  max-width: 5em;
+  min-width: 1em;
+  flex-direction: row;
+}
+
+.new-tag:focus {
+  outline: none;
+}
+
+.edit-tags .tag auto {
+  text-decoration: none;
+}
+
+.edit-tags .tag a:hover {
+  color: red;
+  cursor: crosshair;
+}

@@ -43,7 +43,8 @@ create table wiki_article_tags(
 	id serial primary key,
 	tag text not null,
 	article_id serial references wiki_articles(id),
-	user_id serial references wiki_users(id)
+	user_id serial references wiki_users(id),
+	constraint unique_tag unique (tag,article_id,user_id)
 );
 
 create table wiki_article_comments(

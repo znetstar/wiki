@@ -8,9 +8,17 @@
 			</div>
 			<br/>
 			<div class="article-byline">
-				<small>
-						Last revision made by: <a href="/authors/<%= author['id'] %>" rel="author"><%= author['fname'] %> <%= author['lname'] %></a> on <time datetime="<%= date %>"><%= time %></time>
+					<small>
+							Last revision made by: <a href="/authors/<%= author['id'] %>" rel="author"><%= author['fname'] %> <%= author['lname'] %></a> on <time datetime="<%= date %>"><%= time %></time>
 					</small>
+					<ul class="tags">
+						<li class="static">Tags: </li>
+						<% if (defined? tags) and tags %>
+						<% tags.each do |tag| %>
+						<li class="tag"><a href="/tag/<%= tag['tag'] %>"><%= tag['tag'] %></a></li>
+						<% end %>
+						<% end  %>
+					</ul>
 				</div>
 				<br/>
 				<div class="article-body"><%= html 	%></div>
@@ -20,12 +28,25 @@
 <% if user && (rev_id == 'latest') %>
 <section class="mdl-layout__tab-panel <%= action == 'edit' ? 'is-active' : '' %>" id="edit">
 	<div class="mdl-grid">
-		<div class="noselect mdl-cell mdl-cell--4-col">
+		<div class="noselect mdl-cell mdl-cell--3-col">
 			<div class="mdl-textfield mdl-js-textfield">
 				<input class="mdl-textfield__input" type="text" name="title" value="<%= article['title'] %>" id="title">
 			</div>
 		</div>
-		<div class="noselect mdl-cell mdl-cell--8-col">
+		<div class="noselect mdl-cell mdl-cell--4-col">
+			<ul class="edit-tags">
+				<li class="static">Tags: </li>
+				<% if (defined? tags) and tags %>
+				<% tags.each do |tag| %>
+				<li class="tag"><a href="/tag/<%= tag['tag'] %>"><%= tag['tag'] %></a></li>
+				<% end  %>
+				<% end %>
+				<li class="static">
+					<input type="text" id="new-tag" class="new-tag" placeholder="new tag" />
+				</li>
+			</ul>
+		</div>
+		<div class="noselect mdl-cell mdl-cell--5-col">
 			<button id="view-article" class="view-article mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
 			  <i class="material-icons">visibility</i>
 			</button>

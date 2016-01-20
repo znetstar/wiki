@@ -4,9 +4,10 @@
 
   </div>
   <div class="mdl-cell mdl-cell--4-col">
-    <ul>
+    <ul class="top-tags">
+      <li class="static">Most Used Tags on <%= @title %></li>
       <% tags.each do |tag| %>
-      <li><%= tag %></li>
+      <li class="tag"><a href="/tag/<%= tag['tag'] %>"><%= tag['tag'] %></a></li>
       <% end %>
     </ul>
   </div>
