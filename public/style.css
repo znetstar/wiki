@@ -103,7 +103,8 @@ table.history tr {
   display: flex;
   float: left;
   flex-direction: column;
-  margin: 1em;
+  margin-right: 1em;
+  margin-bottom: 1em;
 }
 
 ul.tags li {
