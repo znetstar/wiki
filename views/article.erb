@@ -17,7 +17,7 @@
 			</article>
 		</div>
 	</section>
-<% if user %>
+<% if user && (rev_id == 'latest') %>
 <section class="mdl-layout__tab-panel <%= action == 'edit' ? 'is-active' : '' %>" id="edit">
 	<div class="mdl-grid">
 		<div class="noselect mdl-cell mdl-cell--4-col">
@@ -45,6 +45,31 @@
 			<textarea class="edit">
 			</textarea>
 		</div>
+	</div>
+</section>
+<section class="mdl-layout__tab-panel <%= action == 'history' ? 'is-active' : '' %>" id="history">
+	<div class="mdl-grid noselect">
+	  <div class="mdl-cell mdl-cell--12-col">
+	  	<p>Revisions made to this article</p>
+			<table class="history mdl-data-table mdl-js-data-table mdl-shadow--2dp">
+			  <thead>
+			    <tr>
+			      <th class="mdl-data-table__cell--non-numeric">Made At</th>
+			      <th class="mdl-data-table__cell--non-numeric">Author</th>
+			      <th class="mdl-data-table__cell--non-numeric">View</th>
+			    </tr>
+			  </thead>
+			  <tbody>
+			  	<% revs.each do |rev| %>
+			    <tr class="history-article" data-article-id="<%= rev['article_id'] %>" data-rev-id="<%= rev['id'] %>">
+			      <td class="mdl-data-table__cell--non-numeric"><%= DateTime.parse(rev['created']).strftime('%m/%d/%Y at %I:%M%p') %></td>
+			      <td class="mdl-data-table__cell--non-numeric"><a target="_blank" href="/authors/<%= rev['author_id'] %>"><%= rev['author_fname'] %> <%= rev['author_lname'] %></a></td>
+			      <td class="mdl-data-table__cell--non-numeric"><a target="_blank" href="/articles/<%= rev['article_id'] %>/view/<%= rev['id'] %>">View</a></td>
+			    </tr>
+			    <% end %>
+			  </tbody>
+			</table>
+	  </div>
 	</div>
 </section>
 <script src="/article.js"></script>

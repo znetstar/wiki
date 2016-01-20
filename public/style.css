@@ -85,3 +85,23 @@ article .article-header h1 {
 .welcome-text {
   font-size: 2em;
 }
+
+small.top-sidebar {
+  padding-left: 40px;
+  line-height: 64px;
+}
+
+table.history {
+  width: 100%;
+}
+
+table.history tr {
+  cursor: pointer;
+}
+
+.card {
+  display: flex;
+  float: left;
+  flex-direction: column;
+  margin: 1em;
+}

@@ -56,22 +56,24 @@ $(function () {
 
 		simplemde._autosave = simplemde.autosave;
 		simplemde.autosave = function () {
-			sync_changes();
 			simplemde._autosave.apply(this, arguments);
 		}
 
-		simplemde.codemirror.on('blur', function () {
-			sync_changes();
-		});
+		simplemde.codemirror.on('blur', sync_changes);
+		simplemde.codemirror.on('focus', sync_changes);
 
 		$('.delete-article').click(function (event) {
 			$.ajax({
 				method: "delete",
-				url: `/article/${$('[name="article_id"]').attr('content')}`
+				url: `/articles/${$('[name="article_id"]').attr('content')}`
 			})
 			.done(function (msg) {
 				window.document.location = '/';
 			});
+		});
+
+		$('.view-article').click(function () {
+			window.document.location = `/articles/${$('[name="article_id"]').attr('content')}`;
 		});
 
 		load_markdown();

@@ -40,7 +40,7 @@
 				  </div>
 				</div>
 			</div>
-	    <% if (defined? article) and (user != nil) %>
+	    <% if (defined? article) and (user != nil) and (rev_id == 'latest') %>
 	    <div class="mdl-layout__tab-bar mdl-js-ripple-effect">
 	      <a href="#view" class="mdl-layout__tab  <%= action == 'view' ? 'is-active' : '' %>">View</a>
 	      <a href="#edit" class="mdl-layout__tab  <%= action == 'edit' ? 'is-active' : '' %>">Edit</a>
@@ -53,6 +53,9 @@
 				<img class="img-responsive" src="<%= @logo %>" />
 			</div>
 			<span class="mdl-layout-title top-sidebar"><%= @title %></span>
+			<% if user %>
+			<small class="top-sidebar">Logged in as <%= "#{user['fname']} #{user['lname']}" %></small>
+			<% end %>
 			<nav class="mdl-navigation">
 				<% if !user %>
 				<a class="mdl-navigation__link" href="/login">Login to <%= @title %></a>

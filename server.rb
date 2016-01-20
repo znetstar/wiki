@@ -69,23 +69,38 @@ module Wiki
 			articles.each do |article| 
 				body = article_body(article['id'])
 				if body
+					html = Nokogiri::HTML(body[:html])
 					article['html'] = body[:html]
 					article['markdown'] = body[:markdown]
-					article['text'] = Nokogiri::HTML(body[:html]).text
+					article['text'] = html.text
 					article['summary'] = article['text'][0..140].gsub(/\s\w+\s*$/,'...')
+					img = html.css('img').first
+					if img
+						article['featured_image'] = img['src']
+					else
+						article['featured_image'] = nil
+					end
 				else
 					article['html'] = nil
 					article['markdown'] = nil
 					article['summary'] =  nil
 					article['text'] = nil
 					article['summary'] = nil
+					article['featured_image'] = nil
 				end
 				arr.push(article)
 			end
 			arr
 		end
 
-		delete '/article/:article_id' do
+		def card(article)
+			erb :article_card, locals: { article: article } 
+		end
+
+		delete '/articles/:article_id' do
+			if !user
+				redirect to('/login')
+			end
 			db.exec("delete from wiki_article_revisions where article_id=#{params[:article_id]}")
 			db.exec("delete from wiki_article_comments where article_id=#{params[:article_id]}")
 			db.exec("delete from wiki_article_tags where article_id=#{params[:article_id]}")
@@ -134,16 +149,19 @@ module Wiki
 				}
 		end
 
-
 		get '/articles/:article_id/:action' do
+			redirect to("/articles/#{params['article_id']}/#{params['action']}/latest")
+		end
+		get '/articles/:article_id/:action/:revision' do
 			if params['action'] != 'view' && !user
 				redirect to('/login')
 			end
 			site_info
 			action = params[:action]
-			rev = db.exec("select body,user_id,created from wiki_article_revisions where article_id=#{params['article_id']} order by created desc limit 1")
-			if rev.num_tuples > 0
-				md = Base64.decode64(rev[0]['body'])
+			rev = db.exec("select user_id,created,body from wiki_article_revisions where #{params['revision'] == 'latest' ? '' : 'id='+params['revision']+' and ' }article_id=#{params['article_id']} order by created desc limit 1")[0]
+			revs = db.exec("select wiki_article_revisions.id,wiki_article_revisions.user_id,wiki_article_revisions.created,wiki_article_revisions.article_id,wiki_users.fname as author_fname,wiki_users.lname as author_lname,wiki_users.id as author_id from wiki_article_revisions,wiki_users where wiki_users.id=wiki_article_revisions.user_id and article_id=#{params['article_id']} order by created desc limit 25")
+			if revs.any?
+				md = Base64.decode64(rev['body'])
 				html = markdown.render(md)
 			end
 			db.exec("update wiki_articles set hits=(wiki_articles.hits + 1) where id=#{params['article_id']}")
@@ -154,12 +172,30 @@ module Wiki
 			
 			if article.num_tuples > 0
 				article = article[0]
-				author = rev.any? ? db.exec("select * from wiki_users where id=#{rev[0]['user_id']}")[0] : user
-				date = DateTime.parse(rev[0]['created']).strftime('%F')
-				time = DateTime.parse(rev[0]['created']).strftime('%m/%d/%Y at %I:%M%p')
-				erb :article, :locals => { :html => html, :markdown => md, :user => user, :action => action, :article => article, :author => author, :date => date, :time => time  }
+				author = revs.any? ? db.exec("select * from wiki_users where id=#{rev['user_id']}")[0] : user
+				date = DateTime.parse(rev['created']).strftime('%F')
+				time = DateTime.parse(rev['created']).strftime('%m/%d/%Y at %I:%M%p')
+				erb :article, :locals => { :rev_id => params['revision'], :revs => revs, :html => html, :markdown => md, :user => user, :action => action, :article => article, :author => author, :date => date, :time => time  }
 			else
 				status 404
+			end
+		end
+
+		get '/history/:page' do
+			site_info
+			if !user
+				return redirect to('/login')
+			end
+			articles = db.exec("select distinct on(wiki_history.article_id) wiki_articles.*,wiki_history.viewed as viewed from wiki_history inner join wiki_articles on(wiki_articles.id = wiki_history.article_id) where wiki_history.user_id=#{user['id']} order by wiki_history.article_id,wiki_history.viewed desc limit 25 offset #{params[:page].to_i*25};")
+
+			erb :history, :locals => { :articles => articles, :user => user }
+		end
+
+		get '/history' do
+			if !user
+				return redirect to('/login')
+			else
+				return redirect to('/history/0')
 			end
 		end
 
@@ -170,7 +206,7 @@ module Wiki
 
 		get '/new_article' do
 			if !user
-				redirect to('/login')
+				return redirect to('/login')
 			end
 			article = db.exec("insert into wiki_articles(title) values('Untitled Article') returning id")[0];
 			rev = db.exec("insert into wiki_article_revisions(user_id,article_id) values('#{user['id']}', '#{article['id']}')")
