@@ -3,6 +3,7 @@ require 'json'
 require 'securerandom'
 require 'redcarpet'
 require 'date'
+require "base64"
 
 module Wiki
 	class Server < Sinatra::Base
@@ -49,9 +50,10 @@ module Wiki
 
 		put '/article/:article_id' do
 			@user = user
+			md = params['body']
 			db.exec("update wiki_articles set title='#{params['title']}' where id=#{params['article_id']}")
-			db.exec("insert into wiki_article_revisions(article_id,user_id,body) values('#{params['article_id']}', '#{@user['id']}', '#{params['body']}')")
-			@markdown = params['body']
+			db.exec("insert into wiki_article_revisions(article_id,user_id,body) values('#{params['article_id']}', '#{@user['id']}', '#{Base64.encode64(params['body'])}')")
+			@markdown = md
 			@html = markdown.render(@markdown)
 			resp = {
 				:title => params['title'],
@@ -84,7 +86,7 @@ module Wiki
 			@action = params[:action]
 			rev = db.exec("select body,user_id,created from wiki_article_revisions where article_id=#{params['article_id']} order by created desc limit 1")
 			if rev.num_tuples > 0
-				@markdown = rev[0]['body']
+				@markdown = Base64.decode64(rev[0]['body'])
 				@html = markdown.render(@markdown)
 			end
 			article = db.exec("select * from wiki_articles where id=#{params['article_id']}")
