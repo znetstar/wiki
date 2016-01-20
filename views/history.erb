@@ -1,0 +1,22 @@
+<div class="mdl-grid noselect">
+  <div class="mdl-cell mdl-cell--12-col">
+  	<p>Articles you've recently viewed</p>
+		<table class="history mdl-data-table mdl-js-data-table mdl-shadow--2dp">
+		  <thead>
+		    <tr>
+		      <th class="mdl-data-table__cell--non-numeric">Article</th>
+		      <th class="mdl-data-table__cell--non-numeric">Last Visted</th>
+		    </tr>
+		  </thead>
+		  <tbody>
+		  	<% articles.each do |article| %>
+		    <tr class="history-article" data-article-id="<%= article['id'] %>">
+		      <td class="mdl-data-table__cell--non-numeric"><%= article['title'] %></td>
+		      <td class="mdl-data-table__cell--non-numeric"><%= DateTime.parse(article['viewed']).strftime('%m/%d/%Y at %I:%M%p') %></td>
+		    </tr>
+		    <% end %>
+		  </tbody>
+		</table>
+  </div>
+</div>
+<script src="/history.js"></script>
