@@ -1,0 +1,54 @@
+<script src="/lib/simplemde/dist/simplemde.min.js"></script>
+<link href="/lib/simplemde/dist/simplemde.min.css" rel="stylesheet"/>
+<section class="mdl-layout__tab-panel <%= @action == 'view' ? 'is-active' : '' %>" id="view">
+	<div class="mdl-grid">
+		<article class="mdl-cell mdl-cell--12-col">
+			<div class="article-header">
+				<h1><%= @article['title'] %></h1>
+			</div>
+			<br/>
+			<div class="article-byline">
+				<small>
+					Last revision made by: <a href="/authors/<%= @author['id'] %>" rel="author"><%= @author['fname'] %> <%= @author['lname'] %></a> on <time datetime="<%= @date %>"><%= @time %></time>
+				</small>
+			</div>
+			<br/>
+			<div class="article-body"><%= @html || ''%></div>
+		</article>
+	</div>
+</section>
+<section class="mdl-layout__tab-panel <%= @action == 'edit' ? 'is-active' : '' %>" id="edit">
+	<div class="mdl-grid">
+		<div class="noselect mdl-cell mdl-cell--4-col">
+			<div class="mdl-textfield mdl-js-textfield">
+				<input class="mdl-textfield__input" type="text" name="title" value="<%= @article['title'] %>" id="title">
+			</div>
+		</div>
+		<div class="noselect mdl-cell mdl-cell--8-col">
+			<button id="view-article" class="view-article mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
+			  <i class="material-icons">visibility</i>
+			</button>
+			<div class="mdl-tooltip" for="view-article">
+				View Article
+			</div>
+			<button id="delete-article" class="delete-article mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
+			  <i class="material-icons">delete</i>
+			</button>
+			<div class="mdl-tooltip" for="delete-article">
+				Delete Article
+			</div>
+		</div>
+	</div>
+	<div class="mdl-grid">
+		<div class="mdl-cell mdl-cell--12-col">
+			<textarea class="edit">
+			</textarea>
+		</div>
+	</div>
+</section>
+<script src="/article.js"></script>
+<script>
+	function load_markdown() {
+		window.simplemde.value("<%= @markdown %>");
+	}
+</script>

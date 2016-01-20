@@ -1,6 +1,8 @@
 require 'bcrypt'
 require 'json'
 require 'securerandom'
+require 'redcarpet'
+require 'date'
 
 module Wiki
 	class Server < Sinatra::Base
@@ -38,6 +40,32 @@ module Wiki
 			return tags
 		end
 
+		def markdown
+			renderer = Redcarpet::Render::HTML.new(render_options = {})
+			@_markdown ||= Redcarpet::Markdown.new(renderer, extensions = {})
+
+			return @_markdown
+		end
+
+		put '/article/:article_id' do
+			@user = user
+			db.exec("update wiki_articles set title='#{params['title']}' where id=#{params['article_id']}")
+			db.exec("insert into wiki_article_revisions(article_id,user_id,body) values('#{params['article_id']}', '#{@user['id']}', '#{params['body']}')")
+			@markdown = params['body']
+			@html = markdown.render(@markdown)
+			resp = {
+				:title => params['title'],
+				:body => @html,
+				:author => {
+					:fname => @user['fname'],
+					:lname => @user['lname'],
+					:id => @user['id']
+				},
+				:datetime => DateTime.now.strftime('%Y-%m-%d %H:%M:%S')
+			}
+			JSON.generate resp
+		end
+
 		get '/' do
 			site_info
 			tags
@@ -46,12 +74,44 @@ module Wiki
 			erb :index
 		end
 
-		get '/articles/edit/:article_id' do
+
+		get '/articles/:article_id/:action' do
+			if params['action'] == 'edit' && !user
+				redirect to('/login')
+			end
+			site_info
+			@user = user
+			@action = params[:action]
+			rev = db.exec("select body,user_id,created from wiki_article_revisions where article_id=#{params['article_id']} order by created desc limit 1")
+			if rev.num_tuples > 0
+				@markdown = rev[0]['body']
+				@html = markdown.render(@markdown)
+			end
+			article = db.exec("select * from wiki_articles where id=#{params['article_id']}")
 			
+			if article.num_tuples > 0
+				@article = article[0]
+				@author = db.exec("select * from wiki_users where id=#{rev[0]['user_id']}")[0]
+				@date = DateTime.parse(rev[0]['created']).strftime('%F')
+				@time = DateTime.parse(rev[0]['created']).strftime('%m/%d/%Y at %I:%M%p')
+				erb :article
+			else
+				status 404
+			end
 		end
 
-		get '/articles/create' do
-			
+
+		get '/articles/:article_id' do
+			redirect to("/articles/#{params['article_id']}/view")
+		end
+
+		get '/new_article' do
+			if !user
+				redirect to('/login')
+			end
+			article = db.exec("insert into wiki_articles(title) values('Untitled Article') returning id")[0];
+
+			redirect to("/articles/#{article['id']}/edit");
 		end
 
 

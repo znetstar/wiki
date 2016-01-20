@@ -20,6 +20,8 @@
     "bootstrap": "~3.3.6",
     "moment": "~2.11.1",
     "font-awesome": "~4.5.0",
-    "material-design-lite": "~1.0.6"
+    "material-design-lite": "~1.0.6",
+    "simplemde": "~1.9.0",
+    "strftime": "~0.9.2"
   }
 }

@@ -61,3 +61,15 @@ form .name > div{
   margin: 1em;
   width: 10em;
 }
+
+article .article-header {
+  border-bottom: gray solid thin;
+}
+
+article .article-header h1 {
+  font-size: 24pt;
+}
+
+.searchbar {
+  color: white;
+}

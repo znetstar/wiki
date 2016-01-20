@@ -33,7 +33,7 @@ create table wiki_sessions(
 
 create table wiki_articles(
 	id serial primary key,
-	title varchar(255) not null,
+	title varchar(255),
 	created timestamp not null default current_timestamp,
 	modified timestamp,
 	hits bigint not null default 0
