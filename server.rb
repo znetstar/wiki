@@ -11,7 +11,7 @@ module Wiki
 		enable :sessions
 
 		def db
-			db ||= PG.connect dbname: 'wiki', user: 'zachary'	
+			db ||= PG.connect(ENV['DATABASE_URL'])
 		end
 
 		def meta(name, val = nil) 
