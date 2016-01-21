@@ -14,7 +14,11 @@ module Wiki
 		register Sinatra::API
 
 		def db
-			db ||= PG.connect(:dbname => 'wiki', :user => 'zachary')
+			if ENV['DATABASE_URL']
+				db ||= PG.connect(ENV['DATABASE_URL'])
+			else
+				db ||= PG.connect(:dbname => 'wiki', :user => 'zachary')
+			end
 		end
 
 		def meta(name, val = nil) 

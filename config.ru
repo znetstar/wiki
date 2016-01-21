@@ -6,4 +6,4 @@ require 'pg'
 require_relative 'server'
 use Rack::MethodOverride
 
-Rack::Handler.default.run(Wiki::Server, :Port => (ENV['PORT'] || 3000))
+Rack::Handler.default.run(Wiki::Server, :Port => (ENV['PORT'] || 7003))
