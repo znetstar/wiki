@@ -343,7 +343,6 @@ module Wiki
 				error = err.message
 				erb :login, :locals => { :err => error  }
 			end
-
 		end
 
 		get '/create' do

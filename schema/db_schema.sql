@@ -72,12 +72,12 @@ create table wiki_history(
 );
 
 create table wiki_bookmarks(
-	id serial primary key,
-	user_id serial references wiki_users(id),
-	article_id serial references wiki_articles(id),
-	last_viewed timestamp not null,
-	first_viewed timestamp not null
-);
+		id serial primary key,
+		user_id serial references wiki_users(id),
+		article_id serial references wiki_articles(id),
+		last_viewed timestamp not null,
+		first_viewed timestamp not null
+	);
 
 insert into wiki_meta(name,value) values('title', 'Wiki');
 insert into wiki_meta(name,value) values('logo', '/img/book.svg');
