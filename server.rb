@@ -5,10 +5,13 @@ require 'redcarpet'
 require 'date'
 require "base64"
 require 'nokogiri'
+require_relative 'api'
 
 module Wiki
 	class Server < Sinatra::Base
 		enable :sessions
+
+		register Sinatra::API
 
 		def db
 			db ||= PG.connect(:dbname => 'wiki', :user => 'zachary')
