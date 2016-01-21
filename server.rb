@@ -277,6 +277,25 @@ module Wiki
 			erb :login, :locals => { :message => message }
 		end
 
+		get '/edit' do
+			site_info
+			email = session[:email]
+			site_info
+			hash = BCrypt::Password.create(params[:password])
+			begin
+				user_id = db.exec("update wiki_users set fname=, lname=, email=, password= values('#{params[:fname]}','#{params[:lname]}', '#{params[:email]}', '#{hash}') returning id;")[0]
+				session[:email] = params[:email]
+				redirect to('/login')
+			rescue PG::Error => err
+				if err.message.include? 'duplicate key'
+					error = 'An account with the submitted email address already exists'
+				else
+					error = err.message
+				end
+				erb :edit, :locals => { :user => user, :email => email }
+			end
+		end
+
 		get '/login' do
 			site_info
 			email = session[:email]

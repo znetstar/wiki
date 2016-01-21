@@ -23,7 +23,6 @@
 	        <a class="mdl-navigation__link" href="/login">Login to <%= @title %></a>
 	      	<% else %>
 	      		<small class="mdl-navigation__link">Welcome <%= user['fname'] %></small>
-	      		<a class="mdl-navigation__link" href="/edit">Edit my account</a>
 	      		<a class="mdl-navigation__link" href="/logout">Logout</a>
 	      	<% end %>
 	      </nav>
@@ -60,6 +59,7 @@
 				<% if !user %>
 				<a class="mdl-navigation__link" href="/login">Login to <%= @title %></a>
 				<% else %>
+				<a class="mdl-navigation__link" href="/logout">Logout</a>
 				<a class="mdl-navigation__link" href="/new_article">Add an Article</a>
 				<a class="mdl-navigation__link" href="/history">History</a>
 				<% end %>
