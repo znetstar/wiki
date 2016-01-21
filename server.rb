@@ -239,7 +239,7 @@ module Wiki
 			if !user
 				return redirect to('/login')
 			end
-			articles = db.exec("select distinct on(wiki_history.article_id) wiki_articles.*,wiki_history.viewed as viewed from wiki_history inner join wiki_articles on(wiki_articles.id = wiki_history.article_id) where wiki_history.user_id=#{user['id']} order by wiki_history.article_id,wiki_history.viewed desc limit 25 offset #{params[:page].to_i*25};")
+			articles = db.exec("select distinct on(wiki_history.article_id) wiki_articles.*,wiki_history.viewed as viewed from wiki_history inner join wiki_articles on(wiki_articles.id = wiki_history.article_id) where wiki_history.user_id=#{user['id']} order by wiki_history.article_id,wiki_history.viewed asc limit 25 offset #{params[:page].to_i*25};")
 
 			erb :history, :locals => { :articles => articles, :user => user }
 		end
