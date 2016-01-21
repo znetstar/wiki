@@ -1,0 +1,12 @@
+<div class="mdl-grid articles">
+  <div>
+    <div class="mdl-cell mdl-cell--12-col">
+      <span>Search results for <%= query %></span>
+    </div>
+    <div class="mdl-cell mdl-cell--12-col">
+      <% articles.each do |article| %>
+      <%= card article %>
+      <% end %>
+    </div>
+  </div>
+</div>

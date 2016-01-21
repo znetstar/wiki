@@ -1,0 +1,10 @@
+<div class="mdl-grid noselect">
+  <div class="mdl-cell mdl-cell--12-col">
+  	<p>Articles you've bookmarked</p>
+    <div class="mdl-cell mdl-cell--12-col">
+      <% articles.each do |article| %>
+      <%= card article %>
+      <% end %>
+    </div>
+  </div>
+</div>
