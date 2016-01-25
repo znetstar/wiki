@@ -17,7 +17,7 @@ module Wiki
 			if ENV['DATABASE_URL']
 				db ||= PG.connect(ENV['DATABASE_URL'])
 			else
-				db ||= PG.connect(:dbname => 'wiki', :user => 'root')
+				db ||= PG.connect(:dbname => 'wiki', :user => 'zachary')
 			end
 		end
 
@@ -310,7 +310,7 @@ module Wiki
 		end
 
 		get '/login' do
-			session[:referer] = headers['referer']
+			session[:referer] = request.referrer
 			site_info
 			email = session[:email]
 			erb :login, :locals => { :email => email }
@@ -334,7 +334,12 @@ module Wiki
 						token = SecureRandom.uuid
 						db.exec("insert into wiki_sessions(user_id, token, created) values (#{_user['id']}, '#{token}', current_timestamp);")
 						session[:session_token] = token
-						redirect to(session[:referer] or '/')
+						if session[:referer] 
+							dest = session[:referer]
+						else 
+							dest = '/'
+						end
+						redirect to(dest)
 					else
 						error = 'Invalid password'
 						email = _user[:email]
@@ -357,6 +362,10 @@ module Wiki
 
 		post '/create' do
 			site_info
+			if params[:password].empty?
+				error = 'No password entered'
+				return erb :create, :locals => { :err => error  }
+			end
 			hash = BCrypt::Password.create(params[:password])
 			begin
 				user_id = db.exec("insert into wiki_users(fname, lname, email, password) values('#{params[:fname]}','#{params[:lname]}', '#{params[:email]}', '#{hash}') returning id;")[0]
