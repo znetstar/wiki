@@ -310,6 +310,7 @@ module Wiki
 		end
 
 		get '/login' do
+			session[:referer] = headers['referer']
 			site_info
 			email = session[:email]
 			erb :login, :locals => { :email => email }
@@ -333,7 +334,7 @@ module Wiki
 						token = SecureRandom.uuid
 						db.exec("insert into wiki_sessions(user_id, token, created) values (#{_user['id']}, '#{token}', current_timestamp);")
 						session[:session_token] = token
-						redirect to('/')
+						redirect to(session[:referer] or '/')
 					else
 						error = 'Invalid password'
 						email = _user[:email]
