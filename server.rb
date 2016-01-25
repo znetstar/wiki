@@ -17,7 +17,7 @@ module Wiki
 			if ENV['DATABASE_URL']
 				db ||= PG.connect(ENV['DATABASE_URL'])
 			else
-				db ||= PG.connect(:dbname => 'wiki', :user => 'zachary')
+				db ||= PG.connect(:dbname => 'wiki', :user => 'root')
 			end
 		end
 
