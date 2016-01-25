@@ -17,7 +17,7 @@ module Wiki
 			if ENV['DATABASE_URL']
 				db ||= PG.connect(ENV['DATABASE_URL'])
 			else
-				db ||= PG.connect(:dbname => 'wiki', :user => 'zachary')
+				db ||= PG.connect(:dbname => 'wiki', :user => (ENV['DB_USER'] || 'root'))
 			end
 		end
 
@@ -334,12 +334,7 @@ module Wiki
 						token = SecureRandom.uuid
 						db.exec("insert into wiki_sessions(user_id, token, created) values (#{_user['id']}, '#{token}', current_timestamp);")
 						session[:session_token] = token
-						if session[:referer] 
-							dest = session[:referer]
-						else 
-							dest = '/'
-						end
-						redirect to(dest)
+						redirect to(session[:referer] || '/')
 					else
 						error = 'Invalid password'
 						email = _user[:email]
