@@ -51,7 +51,7 @@ module Wiki
 		end
 
 		def markdown
-			renderer = Redcarpet::Render::HTML.new(render_options = {})
+			renderer = Redcarpet::Render::HTML.new(escape_html: true)
 			@_markdown ||= Redcarpet::Markdown.new(renderer, extensions = {})
 
 			return @_markdown
