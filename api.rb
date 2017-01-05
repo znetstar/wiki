@@ -4,6 +4,7 @@ require "sinatra/json"
 require 'redcarpet'
 require 'nokogiri'
 require 'date'
+require 'uri'
 
 module Sinatra
   module API
@@ -15,7 +16,7 @@ module Sinatra
 		end
 
 		def db
-			db ||= PG.connect(:dbname => 'wiki', :user => 'zachary')
+			db ||= PG.connect(ENV['DATABASE_URL'])
 		end
 
     def self.registered(app)

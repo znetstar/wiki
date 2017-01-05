@@ -1,6 +1,6 @@
 FROM ruby
 
-EXPOSE 80
+EXPOSE 3000
 
 COPY . /app
 
@@ -8,7 +8,7 @@ WORKDIR /app
 
 ENV DATABASE_URL postgres://postgres:@postgres/wiki
 
-ENV PORT 80
+ENV PORT 3000
 
 RUN bundle install
 
