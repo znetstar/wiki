@@ -8,6 +8,7 @@ GEM
     nokogiri (1.6.8.rc1)
       mini_portile2 (~> 2.0.0)
     pg (0.18.4)
+    puma (3.6.2)
     rack (1.6.4)
     rack-protection (1.5.3)
       rack
@@ -34,9 +35,10 @@ DEPENDENCIES
   bcrypt
   nokogiri
   pg
+  puma
   redcarpet
   sinatra
   sinatra-contrib
 
 BUNDLED WITH
-   1.11.2
+   1.13.7

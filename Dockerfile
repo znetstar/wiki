@@ -2,14 +2,14 @@ FROM ruby
 
 EXPOSE 3000
 
-COPY . /app
+ADD . /app
 
 WORKDIR /app
 
-ENV DATABASE_URL postgres://postgres:@postgres/wiki
+ENV DATABASE_URL postgres://postgres:postgres@postgres/wiki
 
 ENV PORT 3000
 
 RUN bundle install
 
-CMD bundle exec rackup
+CMD bundle exec puma -p $PORT --bind=tcp://0.0.0.0:$PORT

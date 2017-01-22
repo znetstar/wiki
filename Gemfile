@@ -8,3 +8,4 @@ gem 'pg'
 gem 'bcrypt'
 gem 'redcarpet'
 gem 'nokogiri'
+gem "puma"

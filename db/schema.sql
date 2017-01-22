@@ -1,14 +1,13 @@
-drop table if exists wiki_meta cascade;
-drop table if exists wiki_users cascade;
-drop table if exists wiki_sessions cascade;
-drop table if exists wiki_history cascade;
-drop table if exists wiki_bookmarks cascade;
+-- drop table if exists wiki_meta cascade;
+-- drop table if exists wiki_users cascade;
+-- drop table if exists wiki_sessions cascade;
+-- drop table if exists wiki_history cascade;
+-- drop table if exists wiki_bookmarks cascade;
 
-drop table if exists wiki_articles cascade;
-drop table if exists wiki_article_tags cascade;
-drop table if exists wiki_article_comments cascade;
-drop table if exists wiki_article_revisions cascade;
-
+-- drop table if exists wiki_articles cascade;
+-- drop table if exists wiki_article_tags cascade;
+-- drop table if exists wiki_article_comments cascade;
+-- drop table if exists wiki_article_revisions cascade;
 
 create table wiki_meta (
 	id serial primary key,

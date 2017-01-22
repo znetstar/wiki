@@ -11,6 +11,8 @@ module Wiki
 	class Server < Sinatra::Base
 		enable :sessions
 
+		set :bind, '0.0.0.0'
+
 		register Sinatra::API
 
 		def db

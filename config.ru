@@ -4,6 +4,4 @@ require 'sinatra/reloader'
 require 'pg'
 
 require_relative 'server'
-use Rack::MethodOverride
-
-Rack::Handler.default.run(Wiki::Server, :Port => (ENV['PORT'] || 7003))
+Wiki::Server.run!
