@@ -6,12 +6,17 @@ require 'date'
 require "base64"
 require 'nokogiri'
 require_relative 'api'
+require 'sinatra/cross_origin'
 
 module Wiki
 	class Server < Sinatra::Base
 		enable :sessions
 
 		set :bind, '0.0.0.0'
+
+		configure do
+			enable :cross_origin
+		end
 
 		register Sinatra::API
 

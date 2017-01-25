@@ -9,3 +9,4 @@ gem 'bcrypt'
 gem 'redcarpet'
 gem 'nokogiri'
 gem "puma"
+gem "sinatra-cross_origin", "~> 0.3.1"
