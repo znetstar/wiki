@@ -1,6 +1,6 @@
-FROM ruby
+FROM ruby:2.4.0
 
-RUN curl -sL https://deb.nodesource.com/setup_7.x | bash -
+RUN curl -sL https://deb.nodesource.com/setup_8.x | bash -
 
 RUN apt-get install -y nodejs
 
@@ -13,8 +13,6 @@ ADD . /app
 WORKDIR /app
 
 RUN bower install --allow-root
-
-ENV DATABASE_URL postgres://postgres:postgres@postgres/wiki
 
 ENV PORT 3000
 
