@@ -7,7 +7,7 @@
   "description": "",
   "main": "",
   "moduleType": [],
-  "license": "MIT",
+  "license": "Unlicense",
   "ignore": [
     "**/.*",
     "node_modules",
